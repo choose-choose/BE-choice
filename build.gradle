@@ -15,34 +15,34 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-<<<<<<< HEAD
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.jetbrains:annotations:20.1.0'
-=======
+
+//    implementation 'org.springframework.boot:spring-boot-starter-web'
+//    implementation 'org.jetbrains:annotations:20.1.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
->>>>>>> 212268fc228b4dea46530775be853b6254d2c6b3
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
-<<<<<<< HEAD
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    //json을 위한 라이브러리
-    implementation group: 'org.json', name: 'json', version: '20220924'
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//
+//    //json을 위한 라이브러리
+//    implementation group: 'org.json', name: 'json', version: '20220924'
+//
+//    //아래 3개는 jwt를 위한 라이브러리
+//    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+//    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+//    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+//
+//    //validation 라이브러리
+//    implementation 'org.springframework.boot:spring-boot-starter-validation'
+//
+//    // 스프링 시큐리티
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    //아래 3개는 jwt를 위한 라이브러리
-    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
-
-    //validation 라이브러리
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // 스프링 시큐리티
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-=======
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
@@ -65,7 +65,7 @@ dependencies {
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
->>>>>>> 212268fc228b4dea46530775be853b6254d2c6b3
+
 }
 
 tasks.named('test') {

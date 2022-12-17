@@ -1,10 +1,10 @@
 package com.example.moduhouse.global;
 
-<<<<<<< HEAD
-public class MsgResponseDto {
-    private String msg;
-    private int statuscode;
-=======
+
+//public class MsgResponseDto {
+//    private String msg;
+//    private int statuscode;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,5 +18,4 @@ public class MsgResponseDto {
         this.statusCode = statusCode;
         this.msg = msg;
     }
->>>>>>> 212268fc228b4dea46530775be853b6254d2c6b3
 }
