@@ -4,6 +4,7 @@ import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.service.BoardService;
 import com.example.moduhouse.global.MsgResponseDto;
+import com.example.moduhouse.global.exception.SuccessCode;
 import com.example.moduhouse.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class BoardController {
     @DeleteMapping("/board/{id}")
     public MsgResponseDto deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         boardService.deleteBoard(id,userDetails.getUser());
-        return new MsgResponseDto(HttpStatus.OK, "삭제 성공");
+        return new MsgResponseDto(SuccessCode.DELETE_BOARD);
     }
 
     @PostMapping("/board/like/{boardId}")

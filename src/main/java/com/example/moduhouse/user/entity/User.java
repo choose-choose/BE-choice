@@ -1,9 +1,14 @@
 package com.example.moduhouse.user.entity;
 
+import com.example.moduhouse.board.entity.Board;
+import com.example.moduhouse.comment.entity.Comment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -26,13 +31,15 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
-    // Board(게시글) 이 참조하는 관계
-//    @OneToMany(mappedBy = "user")
-//    private List<Board> boards = new ArrayList<>();
-//
-//    // Comment(댓글) 이 참조하는 관계
-//    @OneToMany(mappedBy = "user")
-//    private List<Comment> comments = new ArrayList<>();
+     //Board(게시글) 이 참조하는 관계
+    @OneToMany(mappedBy = "user")
+    private List<Board> boards = new ArrayList<>();
+
+    // Comment(댓글) 이 참조하는 관계
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments = new ArrayList<>();
+
+
 //
 //    @OneToMany(mappedBy = "user")
 //    private List<BoardLike> boardLikes = new ArrayList<>();

@@ -1,6 +1,8 @@
 package com.example.moduhouse.global.jwt;
 
 import com.example.moduhouse.global.MsgResponseDto;
+import com.example.moduhouse.global.exception.CustomException;
+import com.example.moduhouse.global.exception.SuccessCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setStatus(statusCode);
         response.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(new MsgResponseDto(HttpStatus.valueOf(1), "1"));
+            String json = new ObjectMapper().writeValueAsString(new CustomException(statusCode, msg));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());

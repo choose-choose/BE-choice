@@ -8,6 +8,9 @@ import com.example.moduhouse.board.entity.Category;
 import com.example.moduhouse.board.repository.BoardLikeRepository;
 import com.example.moduhouse.board.repository.BoardRepository;
 import com.example.moduhouse.global.MsgResponseDto;
+import com.example.moduhouse.global.exception.CustomException;
+import com.example.moduhouse.global.exception.ErrorCode;
+import com.example.moduhouse.global.exception.SuccessCode;
 import com.example.moduhouse.user.entity.User;
 import com.example.moduhouse.user.entity.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
@@ -142,14 +145,14 @@ public class BoardService {
     @Transactional
     public MsgResponseDto saveBoardLike(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new NullPointerException("게시글이 존재하지 않습니다.")
+                () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
         if (!checkBoardLike(boardId, user)) {
             boardLikeRepository.saveAndFlush(new BoardLike(board, user));
-            return new MsgResponseDto(HttpStatus.OK, "좋아요 완료");
+            return new MsgResponseDto(SuccessCode.LIKE);
         } else {
             boardLikeRepository.deleteByBoardIdAndUserId(boardId, user.getId());
-            return new MsgResponseDto(HttpStatus.OK, "좋아요 취소");
+            return new MsgResponseDto(SuccessCode.CANCEL_LIKE);
         }
     }
 
