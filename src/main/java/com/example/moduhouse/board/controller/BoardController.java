@@ -54,10 +54,17 @@ public class BoardController {
         return new MsgResponseDto(SuccessCode.DELETE_BOARD);
     }
 
-    @PostMapping("/board/like/{boardId}")
+    @PostMapping("/board/{boardId}/boardlike")
     public ResponseEntity<MsgResponseDto> saveBoardLike(
             @PathVariable Long boardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(boardService.saveBoardLike(boardId, userDetails.getUser()));
+    }
+
+    @DeleteMapping("/board/{boardId}/boardCancelLike")
+    public ResponseEntity<MsgResponseDto> saveBoardCancelLike(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok().body(boardService.saveBoardCancelLike(boardId, userDetails.getUser()));
     }
 }
