@@ -1,6 +1,7 @@
 package com.example.moduhouse.board.entity;
 
 import com.example.moduhouse.board.dto.BoardRequestDto;
+import com.example.moduhouse.comment.entity.Comment;
 import com.example.moduhouse.global.entity.Timestamped;
 import com.example.moduhouse.user.entity.User;
 import lombok.Getter;
@@ -22,9 +23,9 @@ public class Board extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
-//    @OrderBy("createdAt DESC")
-//    private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    @OrderBy("createdAt DESC")
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardLike> boardLikeList = new ArrayList<>();

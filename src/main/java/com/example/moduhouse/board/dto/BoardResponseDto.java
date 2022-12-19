@@ -1,10 +1,13 @@
 package com.example.moduhouse.board.dto;
 
 import com.example.moduhouse.board.entity.Board;
+import com.example.moduhouse.comment.dto.CommentResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -31,9 +34,8 @@ public class BoardResponseDto {
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
     }
-//    private List<CommentResponseDto> commentList = new ArrayList<>();
-//  List<CommentResponseDto> commentList,
-    public BoardResponseDto(Board board,  boolean boardLikeCheck) {
+    private List<CommentResponseDto> commentList = new ArrayList<>();
+    public BoardResponseDto(Board board, List<CommentResponseDto> commentList, boolean boardLikeCheck) {
         this.id = board.getId();            //this.id: (위에서 선언된) 필드, Board 객체의 board 매개변수로 들어온 데이터를 getId() 에 담는다(Client 에게로 보내기 위해)
         this.title = board.getTitle();
         this.category = board.getCategory();
@@ -43,6 +45,6 @@ public class BoardResponseDto {
         this.boardLikeCheck = boardLikeCheck;
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
-//        this.commentList = commentList;
+        this.commentList = commentList;
     }
 }
