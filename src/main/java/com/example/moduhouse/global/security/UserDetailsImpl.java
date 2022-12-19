@@ -25,6 +25,8 @@ public class UserDetailsImpl implements UserDetails {
         return user;
     }
 
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
