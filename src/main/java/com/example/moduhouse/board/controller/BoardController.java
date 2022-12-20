@@ -1,5 +1,6 @@
 package com.example.moduhouse.board.controller;
 
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.repository.BoardRepository;
@@ -10,6 +11,7 @@ import com.example.moduhouse.global.s3.S3Uploader;
 import com.example.moduhouse.global.security.UserDetailsImpl;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,14 +22,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class BoardController {
     private final BoardService boardService;
     private final S3Uploader s3Uploader;
-
-    private final BoardRepository boardRepository;
 
     @PostMapping(value = "/board", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BoardResponseDto createBoard(@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -41,7 +42,6 @@ public class BoardController {
                 url.add(s3Uploader.upload(userDetails.getUser(),request,multipart,"static"));
             }
         }
-
       return  boardService.createBoard(request,userDetails.getUser(),url);
     }
 
@@ -61,10 +61,14 @@ public class BoardController {
     }
 
 
-
     @DeleteMapping("/board/{id}")
     public MsgResponseDto deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         boardService.deleteBoard(id, userDetails.getUser());
+
+        List<String> url = new ArrayList<>();
+
+
+
         return new MsgResponseDto(SuccessCode.DELETE_BOARD);
     }
 
@@ -82,5 +86,4 @@ public class BoardController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(boardService.saveBoardCancelLike(boardId, userDetails.getUser()));
     }
-
 }

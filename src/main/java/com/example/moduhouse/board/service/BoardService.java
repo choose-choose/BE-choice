@@ -1,5 +1,6 @@
 package com.example.moduhouse.board.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;
@@ -21,12 +22,16 @@ import com.example.moduhouse.user.entity.UserRoleEnum;
 import com.example.moduhouse.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -35,6 +40,10 @@ public class BoardService {
     private final S3Uploader s3Uploader;
     private final UrlRepository urlRepository;
 
+    @Value("${cloud.aws.s3.bucket}")
+    public String bucket;
+
+
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> url) {
 
@@ -42,7 +51,7 @@ public class BoardService {
             throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
         }
         Board board = boardRepository.save(new Board(requestDto, user));
-        for(String urls : url){
+        for (String urls : url) {
             urlRepository.save(new Url(urls, board));
         }
         return new BoardResponseDto(board);
@@ -102,7 +111,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,String url) {
+    public BoardResponseDto updateBoard(User user, Long id, BoardRequestDto requestDto, String url) {
         Board board;
         if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             board = boardRepository.findById(id).orElseThrow(
@@ -114,7 +123,7 @@ public class BoardService {
             );
         }
 
-        board.update(requestDto,url);
+        board.update(requestDto, url);
 
         List<CommentResponseDto> commentList = new ArrayList<>();
 
@@ -133,17 +142,6 @@ public class BoardService {
 
     }
 
-
-//
-//    // 로컬에 저장된 이미지 지우기
-//    private void removeNewFile(File targetFile) {
-//        if (targetFile.delete()) {
-//            log.info("File delete success");
-//            return;
-//        }
-//        log.info("File delete fail");
-//    }
-
     @Transactional
     public void deleteBoard(Long id, User user) {
         Board board;
@@ -156,7 +154,15 @@ public class BoardService {
                     () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
             );
         }
+        List<Url> urls = urlRepository.findByBoardId(board.getId());
 
+        for (Url url : urls) {
+            String selectUrl = url.getUrl();
+            selectUrl.substring(58);
+            s3Uploader.delete(selectUrl);
+        }
+        urlRepository.deleteAllByBoard(board);
+        board = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NO_BOARD_FOUND));
         boardRepository.delete(board);
     }
 
@@ -171,11 +177,11 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
-        if(checkBoardLike(boardId,user)){
+        if (checkBoardLike(boardId, user)) {
             throw new CustomException(ErrorCode.ALREADY_CLICKED_LIKE);
         }
-            boardLikeRepository.saveAndFlush(new BoardLike(board, user));
-            return new MsgResponseDto(SuccessCode.LIKE);
+        boardLikeRepository.saveAndFlush(new BoardLike(board, user));
+        return new MsgResponseDto(SuccessCode.LIKE);
     }
 
     @Transactional
@@ -183,7 +189,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
-        if(!checkBoardLike(boardId,user)){
+        if (!checkBoardLike(boardId, user)) {
             throw new CustomException(ErrorCode.ALERADY_CANCEL_LIKE);
         }
         boardLikeRepository.deleteByBoardIdAndUserId(boardId, user.getId());

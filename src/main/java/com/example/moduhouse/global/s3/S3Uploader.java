@@ -1,10 +1,11 @@
 package com.example.moduhouse.global.s3;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.example.moduhouse.board.dto.BoardRequestDto;
+import com.example.moduhouse.board.entity.Url;
 import com.example.moduhouse.board.repository.BoardRepository;
 import com.example.moduhouse.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.apache.bcel.classfile.Code;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -24,12 +26,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
+@Service
 @Component
 @RequiredArgsConstructor
 public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
-    private final BoardRepository boardRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
@@ -72,9 +74,13 @@ public class S3Uploader {
             }
             return Optional.of(convertFile);
         }
-
         return Optional.empty();
-
     }
 
+    public void delete(String url) {
+        //Delete 객체 생성
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, url);
+        //Delete
+        amazonS3Client.deleteObject(deleteObjectRequest);
+    }
 }

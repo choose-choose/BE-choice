@@ -21,6 +21,7 @@ public class Url {
     @Column
     private String url;
 
+
     @ManyToOne
     @JoinColumn(name = "Board_ID", nullable = false)
     private Board board;
@@ -30,3 +31,6 @@ public class Url {
         this.url = url;
     }
 }
+
+
+
