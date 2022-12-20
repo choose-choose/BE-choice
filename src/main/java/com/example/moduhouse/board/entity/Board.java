@@ -58,7 +58,7 @@ public class Board extends Timestamped {
         this.user = user;
     }
 
-    public void update(BoardRequestDto boardrequestDto,String url) {
+    public void update(BoardRequestDto boardrequestDto) {
         this.title = boardrequestDto.getTitle();
         this.category = boardrequestDto.getCategory();
         this.contents = boardrequestDto.getContent();

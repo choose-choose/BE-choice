@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface UrlRepository extends JpaRepository<Url, Long> {
     List<Url> findByBoardId(Long boardId);
-
-    @Transactional
-    void deleteAllByBoard (Board board);
 }
+

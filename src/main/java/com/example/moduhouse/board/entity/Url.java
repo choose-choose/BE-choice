@@ -1,10 +1,8 @@
 package com.example.moduhouse.board.entity;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 import javax.persistence.*;
 
@@ -21,7 +19,6 @@ public class Url {
     @Column
     private String url;
 
-
     @ManyToOne
     @JoinColumn(name = "Board_ID", nullable = false)
     private Board board;
@@ -31,6 +28,3 @@ public class Url {
         this.url = url;
     }
 }
-
-
-
