@@ -32,10 +32,9 @@ public class BoardResponseDto {
         this.category = board.getCategory();
         this.contents = board.getContents();
         this.username = board.getUsername();
-        this.url = board.getUrl();
+//        this.url = board.getUrl();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
-        this.url = board.getUrl();
     }
 
     private List<CommentResponseDto> commentList = new ArrayList<>();
@@ -45,12 +44,11 @@ public class BoardResponseDto {
         this.category = board.getCategory();
         this.contents = board.getContents();
         this.username = board.getUsername();
-        this.url = board.getUrl();
+//        this.url = board.getUrl();
         this.boardLikeCount = board.getBoardLikeList().size();
         this.boardLikeCheck = boardLikeCheck;
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
         this.commentList = commentList;
-        this.url = board.getUrl();
     }
 }
