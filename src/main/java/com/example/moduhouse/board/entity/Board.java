@@ -42,23 +42,24 @@ public class Board extends Timestamped {
     @Column
     private String category;
 
-    @Column
-    private String Url;
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Url> urls = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Board(BoardRequestDto requestDto, User user, String url) {
+
+
+    public Board(BoardRequestDto requestDto, User user) {
         this.title = requestDto.getTitle();
         this.username = user.getUsername();
         this.contents = requestDto.getContent();
         this.category = requestDto.getCategory();
         this.user = user;
-        this.Url = url;
     }
 
-    public void update(BoardRequestDto boardrequestDto) {
+    public void update(BoardRequestDto boardrequestDto,String url) {
         this.title = boardrequestDto.getTitle();
         this.category = boardrequestDto.getCategory();
         this.contents = boardrequestDto.getContent();

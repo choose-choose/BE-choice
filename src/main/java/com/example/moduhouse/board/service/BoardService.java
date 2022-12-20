@@ -5,14 +5,17 @@ import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;
 import com.example.moduhouse.board.entity.BoardLike;
 import com.example.moduhouse.board.entity.Category;
+import com.example.moduhouse.board.entity.Url;
 import com.example.moduhouse.board.repository.BoardLikeRepository;
 import com.example.moduhouse.board.repository.BoardRepository;
+import com.example.moduhouse.board.repository.UrlRepository;
 import com.example.moduhouse.comment.dto.CommentResponseDto;
 import com.example.moduhouse.comment.entity.Comment;
 import com.example.moduhouse.global.MsgResponseDto;
 import com.example.moduhouse.global.exception.CustomException;
 import com.example.moduhouse.global.exception.ErrorCode;
 import com.example.moduhouse.global.exception.SuccessCode;
+import com.example.moduhouse.global.s3.S3Uploader;
 import com.example.moduhouse.user.entity.User;
 import com.example.moduhouse.user.entity.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +32,19 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final S3Uploader s3Uploader;
+    private final UrlRepository urlRepository;
 
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, String url) {
+    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> url) {
+
         if (Category.valueOfCategory(requestDto.getCategory()) == null) {
             throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
         }
-        Board board = boardRepository.save(new Board(requestDto, user, url));
+        Board board = boardRepository.save(new Board(requestDto, user));
+        for(String urls : url){
+            urlRepository.save(new Url(urls, board));
+        }
         return new BoardResponseDto(board);
     }
 
@@ -105,7 +114,7 @@ public class BoardService {
             );
         }
 
-        board.update(requestDto);
+        board.update(requestDto,url);
 
         List<CommentResponseDto> commentList = new ArrayList<>();
 
