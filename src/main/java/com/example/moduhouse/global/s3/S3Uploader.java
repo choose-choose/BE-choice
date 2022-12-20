@@ -1,9 +1,10 @@
-package com.example.moduhouse.s3;
+package com.example.moduhouse.global.s3;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.moduhouse.board.dto.BoardRequestDto;
+import com.example.moduhouse.board.repository.BoardRepository;
 import com.example.moduhouse.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +24,22 @@ import java.util.UUID;
 public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
+    private final BoardRepository boardRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public String upload(User user, BoardRequestDto boardRequestDto, MultipartFile multipartFile) throws IOException {
+    public String upload(User user,BoardRequestDto request, MultipartFile multipartFile, String dirName) throws IOException {
         File uploadFile = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
-
-        return upload(uploadFile);
+        return upload(uploadFile, dirName);
     }
     // S3로 파일 업로드하기
-    private String upload(File uploadFile) {
-        String fileName = UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름!!!!!!
+    private String upload(File uploadFile, String dirName) {
+        String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();   // S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
         removeNewFile(uploadFile);
+
+
         return uploadImageUrl;
     }
 
@@ -66,9 +69,7 @@ public class S3Uploader {
         }
 
         return Optional.empty();
+
     }
 
-    public String download(String id) {
-        return amazonS3Client.getUrl(bucket, id).toString();
-    }
 }

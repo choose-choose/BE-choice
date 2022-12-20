@@ -52,6 +52,7 @@ public class WebSecurityConfig {
                 .antMatchers("/api/boards/**").permitAll()
                 .antMatchers("/images").permitAll()        // 확인해보기!!
                 .antMatchers("/api/comment/**").permitAll()
+                .antMatchers("/images").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 

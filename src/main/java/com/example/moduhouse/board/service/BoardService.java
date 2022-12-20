@@ -98,10 +98,8 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(Long id, BoardRequestDto requestDto, User user) {
-
+    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,String url) {
         Board board;
-
         if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             board = boardRepository.findById(id).orElseThrow(
                     () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
@@ -169,14 +167,22 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
-        if (!checkBoardLike(boardId, user)) {
+        if(checkBoardLike(boardId,user)){
+            throw new CustomException(ErrorCode.ALREADY_CLICKED_LIKE);
+        }
             boardLikeRepository.saveAndFlush(new BoardLike(board, user));
             return new MsgResponseDto(SuccessCode.LIKE);
-        } else {
-            boardLikeRepository.deleteByBoardIdAndUserId(boardId, user.getId());
-            return new MsgResponseDto(SuccessCode.CANCEL_LIKE);
-        }
     }
 
-
+    @Transactional
+    public MsgResponseDto saveBoardCancelLike(Long boardId, User user) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
+        );
+        if(!checkBoardLike(boardId,user)){
+            throw new CustomException(ErrorCode.ALERADY_CANCEL_LIKE);
+        }
+        boardLikeRepository.deleteByBoardIdAndUserId(boardId, user.getId());
+        return new MsgResponseDto(SuccessCode.CANCEL_LIKE);
+    }
 }
