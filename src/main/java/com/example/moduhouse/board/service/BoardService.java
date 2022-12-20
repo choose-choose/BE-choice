@@ -31,11 +31,11 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
 
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user) {
+    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, String url) {
         if (Category.valueOfCategory(requestDto.getCategory()) == null) {
             throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
         }
-        Board board = boardRepository.save(new Board(requestDto, user));
+        Board board = boardRepository.save(new Board(requestDto, user, url));
         return new BoardResponseDto(board);
     }
 
@@ -93,10 +93,8 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(Long id, BoardRequestDto requestDto, User user) {
-
+    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,String url) {
         Board board;
-
         if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             board = boardRepository.findById(id).orElseThrow(
                     () -> new CustomException(ErrorCode.NO_BOARD_FOUND)

@@ -51,6 +51,7 @@ public class WebSecurityConfig {
         http.authorizeRequests().antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/boards/**").permitAll()
                 .antMatchers("/api/comment/**").permitAll()
+                .antMatchers("/images").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
