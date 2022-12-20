@@ -21,29 +21,30 @@ public class BoardResponseDto {
     private String username;
     private int boardLikeCount;
     private boolean boardLikeCheck;
-    private String url;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
+    private List<String> urls = new ArrayList<>();
+
     //생성자
-    public BoardResponseDto(Board board) {
+    public BoardResponseDto(Board board, List<String> urls) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.category = board.getCategory();
         this.contents = board.getContents();
         this.username = board.getUsername();
-//        this.url = board.getUrl();
+        this.urls = urls;
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
     }
     private List<CommentResponseDto> commentList = new ArrayList<>();
-    public BoardResponseDto(Board board, List<CommentResponseDto> commentList, boolean boardLikeCheck) {
+    public BoardResponseDto(Board board, List<CommentResponseDto> commentList, boolean boardLikeCheck, List<String> urls) {
         this.id = board.getId();            //this.id: (위에서 선언된) 필드, Board 객체의 board 매개변수로 들어온 데이터를 getId() 에 담는다(Client 에게로 보내기 위해)
         this.title = board.getTitle();
         this.category = board.getCategory();
         this.contents = board.getContents();
         this.username = board.getUsername();
-//        this.url = board.getUrl();
+        this.urls = urls;
         this.boardLikeCount = board.getBoardLikeList().size();
         this.boardLikeCheck = boardLikeCheck;
         this.createdAt = board.getCreatedAt();

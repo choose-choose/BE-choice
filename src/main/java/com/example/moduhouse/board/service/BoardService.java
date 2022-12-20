@@ -45,7 +45,7 @@ public class BoardService {
         for(String urls : url){
             urlRepository.save(new Url(urls, board));
         }
-        return new BoardResponseDto(board);
+        return new BoardResponseDto(board,url);
     }
 
 
@@ -55,6 +55,11 @@ public class BoardService {
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
 
         for (Board board : boardList) {
+            List<Url> url = urlRepository.findByBoardId(board.getId());
+            List<String> urls = new ArrayList<>();
+            for(Url onerul : url){
+                urls.add(onerul.getUrl());
+            }
             List<CommentResponseDto> commentList = new ArrayList<>();
             for (Comment comment : board.getComments()) {
                 commentList.add(new CommentResponseDto(comment));
@@ -62,7 +67,8 @@ public class BoardService {
             boardResponseDto.add(new BoardResponseDto(
                     board,
                     commentList,
-                    (checkBoardLike(board.getId(), user))));
+                    (checkBoardLike(board.getId(), user)),
+                    urls));
         }
         return boardResponseDto;
     }
@@ -74,6 +80,11 @@ public class BoardService {
         List<Board> boardList = boardRepository.findAllByCategoryOrderByCreatedAtDesc(category);
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
         for (Board board : boardList) {
+            List<Url> url = urlRepository.findByBoardId(board.getId());
+            List<String> urls = new ArrayList<>();
+            for(Url onerul : url){
+                urls.add(onerul.getUrl());
+            }
             List<CommentResponseDto> commentList = new ArrayList<>();
             for (Comment comment : board.getComments()) {
                 commentList.add(new CommentResponseDto(comment));
@@ -81,7 +92,8 @@ public class BoardService {
             boardResponseDto.add(new BoardResponseDto(
                     board,
                     commentList,
-                    (checkBoardLike(board.getId(), user))));
+                    (checkBoardLike(board.getId(), user)),
+                    urls));
         }
         return boardResponseDto;
     }
@@ -91,6 +103,11 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
+        List<Url> url = urlRepository.findByBoardId(board.getId());
+        List<String> urls = new ArrayList<>();
+        for(Url onerul : url){
+            urls.add(onerul.getUrl());
+        }
         List<CommentResponseDto> commentList = new ArrayList<>();
         for (Comment comment : board.getComments()) {
             commentList.add(new CommentResponseDto(comment));
@@ -98,11 +115,12 @@ public class BoardService {
         return new BoardResponseDto(
                 board,
                 commentList,
-                (checkBoardLike(board.getId(), user)));
+                (checkBoardLike(board.getId(), user)),
+                urls);
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,String url) {
+    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,List<String> url ,boolean blank) {
         Board board;
         if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             board = boardRepository.findById(id).orElseThrow(
@@ -113,23 +131,29 @@ public class BoardService {
                     () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
             );
         }
-
-        board.update(requestDto,url);
+        board.update(requestDto);
 
         List<CommentResponseDto> commentList = new ArrayList<>();
-
         for (Comment comment : board.getComments()) {
             commentList.add(new CommentResponseDto(comment));
         }
-
         if (Category.valueOfCategory(requestDto.getCategory()) == null) {
             throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
+        }
+
+        if(!blank) {
+            List<Url> listUrl = urlRepository.findByBoardId(board.getId());
+            urlRepository.deleteAll(listUrl);
+            for(String selectUrl : url){
+                urlRepository.save(new Url(selectUrl,board));
+            }
         }
 
         return new BoardResponseDto(
                 board,
                 commentList,
-                (checkBoardLike(board.getId(), user)));
+                (checkBoardLike(board.getId(), user)),
+                url);
 
     }
 
