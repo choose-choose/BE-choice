@@ -3,6 +3,7 @@ package com.example.moduhouse.board.controller;
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;
+
 import com.example.moduhouse.board.repository.BoardRepository;
 import com.example.moduhouse.board.service.BoardService;
 import com.example.moduhouse.global.MsgResponseDto;
@@ -28,20 +29,8 @@ import java.util.List;
 public class BoardController {
     private final BoardService boardService;
     private final S3Uploader s3Uploader;
+
     private final BoardRepository boardRepository;
-
-//    @PostMapping(value = "/board", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public BoardResponseDto saveboard(@AuthenticationPrincipal UserDetailsImpl userDetails,
-//                                      @RequestPart BoardRequestDto boardRequestDto,
-//                                      @RequestPart("image") MultipartFile multipartFile) throws IOException {
-//        String url;
-//        if (multipartFile.isEmpty()) {
-//            url = "";
-//        } else {
-//            url = s3Uploader.upload(userDetails.getUser(), boardRequestDto, multipartFile);
-//        }
-//        return boardService.createBoard(boardRequestDto, userDetails.getUser(), url);
-
     @PostMapping(value = "/board", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BoardResponseDto saveCharacter(@AuthenticationPrincipal UserDetailsImpl userDetails,
                               @RequestPart BoardRequestDto request,
