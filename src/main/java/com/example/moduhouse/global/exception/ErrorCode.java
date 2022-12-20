@@ -25,7 +25,9 @@ public enum ErrorCode {
     NO_DELETE_COMMENT(HttpStatus.UNAUTHORIZED,"댓글 삭제 권한이 없습니다."),
 
     // CONFLICT
-    DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "데이터가 이미 존재합니다")
+    DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "데이터가 이미 존재합니다"),
+    ALREADY_CLICKED_LIKE(HttpStatus.CONFLICT, "이미 좋아요를 눌렀습니다"),
+    ALERADY_CANCEL_LIKE(HttpStatus.CONFLICT, "이미 좋아요 취소를 눌렀습니다")
     ;
 
     private final HttpStatus httpStatus;

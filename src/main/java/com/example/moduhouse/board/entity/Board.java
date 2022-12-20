@@ -42,16 +42,20 @@ public class Board extends Timestamped {
     @Column
     private String category;
 
+    @Column
+    private String Url;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Board(BoardRequestDto requestDto, User user) {
+    public Board(BoardRequestDto requestDto, User user, String url) {
         this.title = requestDto.getTitle();
         this.username = user.getUsername();
         this.contents = requestDto.getContent();
         this.category = requestDto.getCategory();
         this.user = user;
+        this.Url = url;
     }
 
     public void update(BoardRequestDto boardrequestDto) {
