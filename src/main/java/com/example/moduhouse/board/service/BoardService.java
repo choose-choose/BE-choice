@@ -13,12 +13,18 @@ import com.example.moduhouse.global.MsgResponseDto;
 import com.example.moduhouse.global.exception.CustomException;
 import com.example.moduhouse.global.exception.ErrorCode;
 import com.example.moduhouse.global.exception.SuccessCode;
+import com.example.moduhouse.global.security.UserDetailsImpl;
 import com.example.moduhouse.user.entity.User;
 import com.example.moduhouse.user.entity.UserRoleEnum;
+import com.example.moduhouse.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.security.SecurityUtil;
+import org.aspectj.apache.bcel.classfile.Code;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,16 +32,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BoardService {
-
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
 
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user) {
+    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, String url) {
         if (Category.valueOfCategory(requestDto.getCategory()) == null) {
             throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
         }
-        Board board = boardRepository.save(new Board(requestDto, user));
+        Board board = boardRepository.save(new Board(requestDto, user, url));
         return new BoardResponseDto(board);
     }
 
@@ -125,6 +130,17 @@ public class BoardService {
                 (checkBoardLike(board.getId(), user)));
 
     }
+
+
+//
+//    // 로컬에 저장된 이미지 지우기
+//    private void removeNewFile(File targetFile) {
+//        if (targetFile.delete()) {
+//            log.info("File delete success");
+//            return;
+//        }
+//        log.info("File delete fail");
+//    }
 
     @Transactional
     public void deleteBoard(Long id, User user) {

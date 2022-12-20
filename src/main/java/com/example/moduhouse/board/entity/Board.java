@@ -4,19 +4,18 @@ import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.comment.entity.Comment;
 import com.example.moduhouse.global.entity.Timestamped;
 import com.example.moduhouse.user.entity.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Getter
 @Setter
 @Entity
 @Table(name = "Board")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Board extends Timestamped {
 
     @Id
@@ -42,6 +41,9 @@ public class Board extends Timestamped {
     @Column
     private String category;
 
+    @Column
+    private String url;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -52,6 +54,15 @@ public class Board extends Timestamped {
         this.contents = requestDto.getContent();
         this.category = requestDto.getCategory();
         this.user = user;
+    }
+
+    public Board(BoardRequestDto requestDto, User user, String url) {
+        this.title = requestDto.getTitle();
+        this.username = user.getUsername();
+        this.contents = requestDto.getContent();
+        this.category = requestDto.getCategory();
+        this.user = user;
+        this.url = url;
     }
 
     public void update(BoardRequestDto boardrequestDto) {
