@@ -29,7 +29,6 @@ public class BoardController {
 
     private final BoardService boardService;
     private final S3Uploader s3Uploader;
-    private final BoardRepository boardRepository;
     private final UrlRepository urlRepository;
 
     @PostMapping(value = "/board", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -49,8 +48,8 @@ public class BoardController {
         return boardService.createBoard(request, userDetails.getUser(), url);
     }
 
-
-    @PutMapping("/board/{id}")
+    //게시글 수정
+    @PutMapping("/boards/{id}")
     public BoardResponseDto updateBoard(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                         @PathVariable Long id,
                                         @RequestPart BoardRequestDto requestDto,
@@ -72,43 +71,47 @@ public class BoardController {
     }
 
 
+    // 게시글 전체 조회
     @GetMapping("/boards")
     public List<BoardResponseDto> getListBoards(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return boardService.getListBoards(userDetails.getUser());
     }
 
-    @GetMapping("/boards/{category}")
-    public List<BoardResponseDto> getCategoryListBoards(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable String category) {
-        return boardService.getCategoryListBoards(userDetails.getUser(), category);
+    // 게시글 지역 조회
+    @GetMapping("/localBoards")
+    public List<BoardResponseDto> getLocalListBoards(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam String local) {
+        return boardService.getLocalListBoards(userDetails.getUser(), local);
     }
 
 
-    @GetMapping("/board/{id}")
+    // 게시글 상세 조회 boardId
+    @GetMapping("/boards/{id}")
     public BoardResponseDto getBoards(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return boardService.getBoard(id, userDetails.getUser());
     }
 
 
-    @DeleteMapping("/board/{id}")
+
+    // 게시글 삭제
+    @DeleteMapping("/boards/{id}")
     public MsgResponseDto deleteBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         boardService.deleteBoard(id, userDetails.getUser());
         return new MsgResponseDto(SuccessCode.DELETE_BOARD);
     }
 
-
-    @PostMapping("/board/{boardId}/boardlike")
+    // 게시글 좋아요
+    @PostMapping("/boards/{boardId}/boardLike")
     public ResponseEntity<MsgResponseDto> saveBoardLike(
             @PathVariable Long boardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(boardService.saveBoardLike(boardId, userDetails.getUser()));
     }
 
-    @DeleteMapping("/board/{boardId}/boardCancelLike")
-    public ResponseEntity<MsgResponseDto> saveBoardCancelLike(
+    // 게시글 좋아요 취소
+    @DeleteMapping("/boards/{boardId}/boardLike")
+    public ResponseEntity<MsgResponseDto> cancelBoardLike(
             @PathVariable Long boardId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok().body(boardService.saveBoardCancelLike(boardId, userDetails.getUser()));
+        return ResponseEntity.ok().body(boardService.cancelBoardLike(boardId, userDetails.getUser()));
     }
-
-
 }

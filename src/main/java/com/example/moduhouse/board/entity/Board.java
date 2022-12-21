@@ -39,7 +39,7 @@ public class Board extends Timestamped {
     private String contents;
 
     @Column
-    private String category;
+    private String local;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Url> urls = new ArrayList<>();
@@ -53,13 +53,13 @@ public class Board extends Timestamped {
         this.title = requestDto.getTitle();
         this.username = user.getUsername();
         this.contents = requestDto.getContent();
-        this.category = requestDto.getCategory();
+        this.local = requestDto.getLocal();
         this.user = user;
     }
 
     public void update(BoardRequestDto boardrequestDto) {
         this.title = boardrequestDto.getTitle();
-        this.category = boardrequestDto.getCategory();
+        this.local = boardrequestDto.getLocal();
         this.contents = boardrequestDto.getContent();
     }
 }

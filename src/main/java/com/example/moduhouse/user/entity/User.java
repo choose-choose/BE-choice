@@ -39,14 +39,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Comment> comments = new ArrayList<>();
 
-
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<BoardLike> boardLikes = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user")
-//    private List<CommentLike> commentLikes = new ArrayList<>();
-
     public User(String username, String password, UserRoleEnum role) {
         this.username = username;
         this.password = password;

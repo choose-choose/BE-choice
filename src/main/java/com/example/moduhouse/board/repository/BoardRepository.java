@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     List<Board> findAllByOrderByCreatedAtDesc();
-    List<Board> findAllByCategoryOrderByCreatedAtDesc(String category);
+    List<Board> findAllByLocalOrderByCreatedAtDesc(String local);
 
     //게시글 수정, 삭제
     Optional<Board> findByIdAndUserId(Long id, Long userId);

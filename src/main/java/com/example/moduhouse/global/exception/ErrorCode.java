@@ -16,7 +16,7 @@ public enum ErrorCode {
     NO_BOARD_FOUND(HttpStatus.NOT_FOUND, "게시글이 존재하지 않습니다."),
     NO_EXIST_USER(HttpStatus.NOT_FOUND, "등록된 사용자가 없습니다."),
     NO_EXIST_COMMENT(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다."),
-    NO_EXIST_CATEGORY(HttpStatus.NOT_FOUND,"카테고리를 찾을 수 없습니다."),
+    NO_EXIST_LOCAL(HttpStatus.NOT_FOUND,"카테고리를 찾을 수 없습니다."),
 
     // UNAUTHORIZED
     NO_MODIFY_BOARD(HttpStatus.UNAUTHORIZED,"게시글 수정 권한이 없습니다."),
