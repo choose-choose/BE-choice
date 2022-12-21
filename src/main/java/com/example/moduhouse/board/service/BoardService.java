@@ -1,15 +1,14 @@
 package com.example.moduhouse.board.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;
 import com.example.moduhouse.board.entity.BoardLike;
+import com.example.moduhouse.board.entity.Image;
 import com.example.moduhouse.board.entity.Local;
-import com.example.moduhouse.board.entity.Url;
 import com.example.moduhouse.board.repository.BoardLikeRepository;
 import com.example.moduhouse.board.repository.BoardRepository;
-import com.example.moduhouse.board.repository.UrlRepository;
+import com.example.moduhouse.board.repository.ImageRepository;
 import com.example.moduhouse.comment.dto.CommentResponseDto;
 import com.example.moduhouse.comment.entity.Comment;
 import com.example.moduhouse.global.MsgResponseDto;
@@ -34,19 +33,19 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final S3Uploader s3Uploader;
-    private final UrlRepository urlRepository;
+    private final ImageRepository imageRepository;
 
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> url) {
+    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> image) {
 
         if (Local.valueOfLocal(requestDto.getLocal()) == null) {
             throw new CustomException(ErrorCode.NO_EXIST_LOCAL);
         }
         Board board = boardRepository.save(new Board(requestDto, user));
-        for(String urls : url){
-            urlRepository.save(new Url(urls, board));
+        for(String images : image){
+            imageRepository.save(new Image(images, board));
         }
-        return new BoardResponseDto(board,url);
+        return new BoardResponseDto(board,image);
     }
 
 
@@ -55,24 +54,28 @@ public class BoardService {
         List<Board> boardList = boardRepository.findAllByOrderByCreatedAtDesc();
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
 
-        for (Board board : boardList) {
-            List<Url> url = urlRepository.findByBoardId(board.getId());
-            List<String> urls = new ArrayList<>();
-            for(Url onerul : url){
-                urls.add(onerul.getUrl());
+
+
+            for (Board board : boardList) {
+                List<Image> image = imageRepository.findByBoardId(board.getId());
+                List<String> images = new ArrayList<>();
+                for (Image oneImage : image) {
+                    images.add(oneImage.getImage());
+                }
+                List<CommentResponseDto> commentList = new ArrayList<>();
+                for (Comment comment : board.getComments()) {
+                    commentList.add(new CommentResponseDto(comment));
+                }
+
+                boardResponseDto.add(new BoardResponseDto(
+                        board,
+                        commentList,
+                        (checkBoardLike(board.getId(), user)),
+                        images));
             }
-            List<CommentResponseDto> commentList = new ArrayList<>();
-            for (Comment comment : board.getComments()) {
-                commentList.add(new CommentResponseDto(comment));
-            }
-            boardResponseDto.add(new BoardResponseDto(
-                    board,
-                    commentList,
-                    (checkBoardLike(board.getId(), user)),
-                    urls));
+            return boardResponseDto;
         }
-        return boardResponseDto;
-    }
+
 
     public List<BoardResponseDto> getLocalListBoards(User user, String local) {
         if (Local.valueOfLocal(local) == null) {
@@ -81,10 +84,10 @@ public class BoardService {
         List<Board> boardList = boardRepository.findAllByLocalOrderByCreatedAtDesc(local);
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
         for (Board board : boardList) {
-            List<Url> url = urlRepository.findByBoardId(board.getId());
-            List<String> urls = new ArrayList<>();
-            for(Url onerul : url){
-                urls.add(onerul.getUrl());
+            List<Image> image = imageRepository.findByBoardId(board.getId());
+            List<String> images = new ArrayList<>();
+            for(Image oneImage : image){
+                images.add(oneImage.getImage());
             }
             List<CommentResponseDto> commentList = new ArrayList<>();
             for (Comment comment : board.getComments()) {
@@ -94,7 +97,7 @@ public class BoardService {
                     board,
                     commentList,
                     (checkBoardLike(board.getId(), user)),
-                    urls));
+                    images));
         }
         return boardResponseDto;
     }
@@ -104,10 +107,10 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
-        List<Url> url = urlRepository.findByBoardId(board.getId());
-        List<String> urls = new ArrayList<>();
-        for(Url onerul : url){
-            urls.add(onerul.getUrl());
+        List<Image> image = imageRepository.findByBoardId(board.getId());
+        List<String> images = new ArrayList<>();
+        for(Image oneImage : image){
+            images.add(oneImage.getImage());
         }
         List<CommentResponseDto> commentList = new ArrayList<>();
         for (Comment comment : board.getComments()) {
@@ -117,11 +120,11 @@ public class BoardService {
                 board,
                 commentList,
                 (checkBoardLike(board.getId(), user)),
-                urls);
+                images);
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,List<String> url ,boolean blank) {
+    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,List<String> image ,boolean blank) {
         Board board;
         if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             board = boardRepository.findById(id).orElseThrow(
@@ -143,15 +146,15 @@ public class BoardService {
         }
 
         if(!blank) {
-            List<Url> listUrl = urlRepository.findByBoardId(board.getId());
-            for (Url OneUrl : listUrl) {
-                String selectUrl = OneUrl.getUrl();
-                String fileName = selectUrl.substring(57);
+            List<Image> listImage = imageRepository.findByBoardId(board.getId());
+            for (Image oneImage : listImage) {
+                String selectImage = oneImage.getImage();
+                String fileName = selectImage.substring(57);
                 s3Uploader.delete(fileName, "static");
             }
-            urlRepository.deleteAll(listUrl);
-            for(String selectUrl : url){
-                urlRepository.save(new Url(selectUrl,board));
+            imageRepository.deleteAll(listImage);
+            for(String selectImage : image){
+                imageRepository.save(new Image(selectImage,board));
             }
         }
 
@@ -159,7 +162,7 @@ public class BoardService {
                 board,
                 commentList,
                 (checkBoardLike(board.getId(), user)),
-                url);
+                image);
 
     }
 
@@ -176,15 +179,15 @@ public class BoardService {
             );
         }
 
-        List<Url> urls = urlRepository.findByBoardId(board.getId());
+        List<Image> images = imageRepository.findByBoardId(board.getId());
 
-        for (Url url : urls) {
-            String selectUrl = url.getUrl();
-             String fileName = selectUrl.substring(69);
+        for (Image image : images) {
+            String selectImage = image.getImage();
+             String fileName = selectImage.substring(69);
             s3Uploader.delete(fileName, "static");
         }
 
-        urlRepository.deleteAllByBoardId(board.getId());
+        imageRepository.deleteAllByBoardId(board.getId());
         boardRepository.delete(board);
     }
 

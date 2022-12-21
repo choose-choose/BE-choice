@@ -2,9 +2,8 @@ package com.example.moduhouse.board.controller;
 
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
-import com.example.moduhouse.board.entity.Url;
-import com.example.moduhouse.board.repository.BoardRepository;
-import com.example.moduhouse.board.repository.UrlRepository;
+import com.example.moduhouse.board.entity.Image;
+import com.example.moduhouse.board.repository.ImageRepository;
 import com.example.moduhouse.board.service.BoardService;
 import com.example.moduhouse.global.MsgResponseDto;
 import com.example.moduhouse.global.exception.SuccessCode;
@@ -29,20 +28,20 @@ public class BoardController {
 
     private final BoardService boardService;
     private final S3Uploader s3Uploader;
-    private final UrlRepository urlRepository;
+    private final ImageRepository imageRepository;
 
     @PostMapping(value = "/board", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public BoardResponseDto createBoard(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                         @RequestPart BoardRequestDto request,
                                         @RequestPart("image") List<MultipartFile> multipartFile) throws IOException {
-        List<String> url = new ArrayList<>();
+        List<String> image = new ArrayList<>();
 
         for (MultipartFile multipart : multipartFile) {
             if (!multipart.isEmpty()) {
-                url.add(s3Uploader.upload(userDetails.getUser(), request, multipart, "static"));
+                image.add(s3Uploader.upload(userDetails.getUser(), request, multipart, "static"));
             }
         }
-        return boardService.createBoard(request, userDetails.getUser(), url);
+        return boardService.createBoard(request, userDetails.getUser(), image);
     }
 
     //게시글 수정
@@ -51,20 +50,20 @@ public class BoardController {
                                         @PathVariable Long id,
                                         @RequestPart BoardRequestDto requestDto,
                                         @RequestPart("image") List<MultipartFile> multipartFile) throws IOException {
-        List<String> url = new ArrayList<>();
+        List<String> image = new ArrayList<>();
         boolean blank = false;
         for (MultipartFile multipart : multipartFile){
             if(multipart.isEmpty()){
-                List<Url> urls = urlRepository.findByBoardId(id);
-                for(Url selectUrl : urls){
-                    url.add(selectUrl.getUrl());
+                List<Image> images = imageRepository.findByBoardId(id);
+                for(Image selectImage : images){
+                    image.add(selectImage.getImage());
                     blank = true;
                 }
             } else{
-                url.add(s3Uploader.upload(userDetails.getUser(), requestDto, multipart, "static"));
+                image.add(s3Uploader.upload(userDetails.getUser(), requestDto, multipart, "static"));
             }
         }
-        return boardService.updateBoard(userDetails.getUser(), id, requestDto, url, blank);
+        return boardService.updateBoard(userDetails.getUser(), id, requestDto, image, blank);
     }
 
 

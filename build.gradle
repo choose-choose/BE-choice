@@ -76,7 +76,7 @@ dependencies {
     // mysql
     runtimeOnly 'mysql:mysql-connector-java'
     implementation 'mysql:mysql-connector-java'
-
+    implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.31'
 
 
 }

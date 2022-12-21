@@ -42,7 +42,7 @@ public class Board extends Timestamped {
     private String local;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
-    private List<Url> urls = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

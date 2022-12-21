@@ -9,22 +9,22 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "Url")
+@Table(name = "Image")
 @NoArgsConstructor
-public class Url {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private String url;
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "Board_ID", nullable = false)
     private Board board;
 
-    public Url(String url, Board board){
+    public Image(String image, Board board){
         this.board = board;
-        this.url = url;
+        this.image = image;
     }
 }
