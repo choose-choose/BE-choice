@@ -38,13 +38,10 @@ public class BoardController {
         List<String> url = new ArrayList<>();
 
         for (MultipartFile multipart : multipartFile) {
-            if (multipart.isEmpty()) {
-                url.add("");
-            } else {
+            if (!multipart.isEmpty()) {
                 url.add(s3Uploader.upload(userDetails.getUser(), request, multipart, "static"));
             }
         }
-
         return boardService.createBoard(request, userDetails.getUser(), url);
     }
 
