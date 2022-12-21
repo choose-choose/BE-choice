@@ -35,7 +35,6 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final S3Uploader s3Uploader;
     private final UrlRepository urlRepository;
-    private final AmazonS3Client amazonS3Client;
 
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> url) {
@@ -209,7 +208,7 @@ public class BoardService {
 
     @Transactional
     public MsgResponseDto cancelBoardLike(Long boardId, User user) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
+        boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
         if(!checkBoardLike(boardId,user)){
