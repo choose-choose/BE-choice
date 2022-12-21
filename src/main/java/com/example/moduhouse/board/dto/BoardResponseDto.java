@@ -47,7 +47,7 @@ public class BoardResponseDto {
         this.username = board.getUsername();
         this.image = urls;
         this.boardLike = board.getBoardLikeList().size();
-//        this.boardLikeCheck = boardLikeCheck;
+        this.boardLikeCheck = boardLikeCheck;
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
         this.commentList = commentList;
