@@ -1,4 +1,4 @@
-package com.example.moduhouse.comment;
+package com.example.moduhouse.comment.repository;
 
 import com.example.moduhouse.comment.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
