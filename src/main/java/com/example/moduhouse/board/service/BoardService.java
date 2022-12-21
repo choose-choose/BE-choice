@@ -21,7 +21,9 @@ import com.example.moduhouse.user.entity.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,16 +38,21 @@ public class BoardService {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> image) {
-
+    public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<MultipartFile> multipartFile) throws IOException {
+        List<String> image = new ArrayList<>();
+        for (MultipartFile multipart : multipartFile) {
+            if (!multipart.isEmpty()) {
+                image.add(s3Uploader.upload(user, requestDto, multipart, "static"));
+            }
+        }
         if (Local.valueOfLocal(requestDto.getLocal()) == null) {
             throw new CustomException(ErrorCode.NO_EXIST_LOCAL);
         }
         Board board = boardRepository.save(new Board(requestDto, user));
-        for(String images : image){
+        for (String images : image) {
             imageRepository.save(new Image(images, board));
         }
-        return new BoardResponseDto(board,image);
+        return new BoardResponseDto(board, image);
     }
 
 
@@ -55,26 +62,25 @@ public class BoardService {
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
 
 
-
-            for (Board board : boardList) {
-                List<Image> image = imageRepository.findByBoardId(board.getId());
-                List<String> images = new ArrayList<>();
-                for (Image oneImage : image) {
-                    images.add(oneImage.getImage());
-                }
-                List<CommentResponseDto> commentList = new ArrayList<>();
-                for (Comment comment : board.getComments()) {
-                    commentList.add(new CommentResponseDto(comment));
-                }
-
-                boardResponseDto.add(new BoardResponseDto(
-                        board,
-                        commentList,
-                        (checkBoardLike(board.getId(), user)),
-                        images));
+        for (Board board : boardList) {
+            List<Image> image = imageRepository.findByBoardId(board.getId());
+            List<String> images = new ArrayList<>();
+            for (Image oneImage : image) {
+                images.add(oneImage.getImage());
             }
-            return boardResponseDto;
+            List<CommentResponseDto> commentList = new ArrayList<>();
+            for (Comment comment : board.getComments()) {
+                commentList.add(new CommentResponseDto(comment));
+            }
+
+            boardResponseDto.add(new BoardResponseDto(
+                    board,
+                    commentList,
+                    (checkBoardLike(board.getId(), user)),
+                    images));
         }
+        return boardResponseDto;
+    }
 
 
     public List<BoardResponseDto> getLocalListBoards(User user, String local) {
@@ -86,7 +92,7 @@ public class BoardService {
         for (Board board : boardList) {
             List<Image> image = imageRepository.findByBoardId(board.getId());
             List<String> images = new ArrayList<>();
-            for(Image oneImage : image){
+            for (Image oneImage : image) {
                 images.add(oneImage.getImage());
             }
             List<CommentResponseDto> commentList = new ArrayList<>();
@@ -109,7 +115,7 @@ public class BoardService {
         );
         List<Image> image = imageRepository.findByBoardId(board.getId());
         List<String> images = new ArrayList<>();
-        for(Image oneImage : image){
+        for (Image oneImage : image) {
             images.add(oneImage.getImage());
         }
         List<CommentResponseDto> commentList = new ArrayList<>();
@@ -124,8 +130,9 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponseDto updateBoard(User user,Long id, BoardRequestDto requestDto,List<String> image ,boolean blank) {
+    public BoardResponseDto updateBoard(User user, Long id, BoardRequestDto requestDto, List<MultipartFile> multipartFile) throws IOException {
         Board board;
+
         if (user.getRole().equals(UserRoleEnum.ADMIN)) {
             board = boardRepository.findById(id).orElseThrow(
                     () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
@@ -145,16 +152,26 @@ public class BoardService {
             throw new CustomException(ErrorCode.NO_EXIST_LOCAL);
         }
 
-        if(!blank) {
-            List<Image> listImage = imageRepository.findByBoardId(board.getId());
-            for (Image oneImage : listImage) {
-                String selectImage = oneImage.getImage();
-                String fileName = selectImage.substring(57);
-                s3Uploader.delete(fileName, "static");
-            }
-            imageRepository.deleteAll(listImage);
-            for(String selectImage : image){
-                imageRepository.save(new Image(selectImage,board));
+        List<String> image = new ArrayList<>();
+        for (MultipartFile multipart : multipartFile) {
+            if (!multipart.isEmpty()) { // 사진이 수정된 경우
+                image.add(s3Uploader.upload(user, requestDto, multipart, "static")); // 새로들어온 이미지 s3 저장
+
+                List<Image> listImage = imageRepository.findByBoardId(board.getId());
+
+                for (Image oneImage : listImage) { // s3 이미지 삭제
+                    String selectImage = oneImage.getImage();
+
+                    String fileName = selectImage.substring(57);
+
+                    s3Uploader.delete(fileName, "static");
+                }
+
+                imageRepository.deleteAll(listImage); // image 테이블에서 이미지 삭제
+
+                for (String selectImage : image) { // 새로 들어온 이미지 테이블에 저장
+                    imageRepository.save(new Image(selectImage, board));
+                }
             }
         }
 
@@ -183,7 +200,7 @@ public class BoardService {
 
         for (Image image : images) {
             String selectImage = image.getImage();
-             String fileName = selectImage.substring(69);
+            String fileName = selectImage.substring(69);
             s3Uploader.delete(fileName, "static");
         }
 
@@ -202,7 +219,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
-        if(checkBoardLike(boardId,user)){
+        if (checkBoardLike(boardId, user)) {
             throw new CustomException(ErrorCode.ALREADY_CLICKED_LIKE);
         }
         boardLikeRepository.saveAndFlush(new BoardLike(board, user));
@@ -214,7 +231,7 @@ public class BoardService {
         boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );
-        if(!checkBoardLike(boardId,user)){
+        if (!checkBoardLike(boardId, user)) {
             throw new CustomException(ErrorCode.ALERADY_CANCEL_LIKE);
         }
         boardLikeRepository.deleteByBoardIdAndUserId(boardId, user.getId());
