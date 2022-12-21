@@ -1,10 +1,11 @@
 package com.example.moduhouse.board.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;
 import com.example.moduhouse.board.entity.BoardLike;
-import com.example.moduhouse.board.entity.Category;
+import com.example.moduhouse.board.entity.Local;
 import com.example.moduhouse.board.entity.Url;
 import com.example.moduhouse.board.repository.BoardLikeRepository;
 import com.example.moduhouse.board.repository.BoardRepository;
@@ -34,12 +35,13 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final S3Uploader s3Uploader;
     private final UrlRepository urlRepository;
+    private final AmazonS3Client amazonS3Client;
 
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> url) {
 
-        if (Category.valueOfCategory(requestDto.getCategory()) == null) {
-            throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
+        if (Local.valueOfLocal(requestDto.getLocal()) == null) {
+            throw new CustomException(ErrorCode.NO_EXIST_LOCAL);
         }
         Board board = boardRepository.save(new Board(requestDto, user));
         for(String urls : url){
@@ -73,11 +75,11 @@ public class BoardService {
         return boardResponseDto;
     }
 
-    public List<BoardResponseDto> getCategoryListBoards(User user, String category) {
-        if (Category.valueOfCategory(category) == null) {
-            throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
+    public List<BoardResponseDto> getLocalListBoards(User user, String local) {
+        if (Local.valueOfLocal(local) == null) {
+            throw new CustomException(ErrorCode.NO_EXIST_LOCAL);
         }
-        List<Board> boardList = boardRepository.findAllByCategoryOrderByCreatedAtDesc(category);
+        List<Board> boardList = boardRepository.findAllByLocalOrderByCreatedAtDesc(local);
         List<BoardResponseDto> boardResponseDto = new ArrayList<>();
         for (Board board : boardList) {
             List<Url> url = urlRepository.findByBoardId(board.getId());
@@ -137,12 +139,17 @@ public class BoardService {
         for (Comment comment : board.getComments()) {
             commentList.add(new CommentResponseDto(comment));
         }
-        if (Category.valueOfCategory(requestDto.getCategory()) == null) {
-            throw new CustomException(ErrorCode.NO_EXIST_CATEGORY);
+        if (Local.valueOfLocal(requestDto.getLocal()) == null) {
+            throw new CustomException(ErrorCode.NO_EXIST_LOCAL);
         }
 
         if(!blank) {
             List<Url> listUrl = urlRepository.findByBoardId(board.getId());
+            for (Url OneUrl : listUrl) {
+                String selectUrl = OneUrl.getUrl();
+                String fileName = selectUrl.substring(57);
+                s3Uploader.delete(fileName, "static");
+            }
             urlRepository.deleteAll(listUrl);
             for(String selectUrl : url){
                 urlRepository.save(new Url(selectUrl,board));
@@ -170,6 +177,15 @@ public class BoardService {
             );
         }
 
+        List<Url> urls = urlRepository.findByBoardId(board.getId());
+
+        for (Url url : urls) {
+            String selectUrl = url.getUrl();
+             String fileName = selectUrl.substring(69);
+            s3Uploader.delete(fileName, "static");
+        }
+
+        urlRepository.deleteAllByBoardId(board.getId());
         boardRepository.delete(board);
     }
 
@@ -187,12 +203,12 @@ public class BoardService {
         if(checkBoardLike(boardId,user)){
             throw new CustomException(ErrorCode.ALREADY_CLICKED_LIKE);
         }
-            boardLikeRepository.saveAndFlush(new BoardLike(board, user));
-            return new MsgResponseDto(SuccessCode.LIKE);
+        boardLikeRepository.saveAndFlush(new BoardLike(board, user));
+        return new MsgResponseDto(SuccessCode.LIKE);
     }
 
     @Transactional
-    public MsgResponseDto saveBoardCancelLike(Long boardId, User user) {
+    public MsgResponseDto cancelBoardLike(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.NO_BOARD_FOUND)
         );

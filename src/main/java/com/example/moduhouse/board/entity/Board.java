@@ -4,19 +4,18 @@ import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.comment.entity.Comment;
 import com.example.moduhouse.global.entity.Timestamped;
 import com.example.moduhouse.user.entity.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Getter
 @Setter
 @Entity
 @Table(name = "Board")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Board extends Timestamped {
 
     @Id
@@ -40,7 +39,7 @@ public class Board extends Timestamped {
     private String contents;
 
     @Column
-    private String category;
+    private String local;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Url> urls = new ArrayList<>();
@@ -50,18 +49,17 @@ public class Board extends Timestamped {
     private User user;
 
 
-
     public Board(BoardRequestDto requestDto, User user) {
         this.title = requestDto.getTitle();
         this.username = user.getUsername();
         this.contents = requestDto.getContent();
-        this.category = requestDto.getCategory();
+        this.local = requestDto.getLocal();
         this.user = user;
     }
 
     public void update(BoardRequestDto boardrequestDto) {
         this.title = boardrequestDto.getTitle();
-        this.category = boardrequestDto.getCategory();
+        this.local = boardrequestDto.getLocal();
         this.contents = boardrequestDto.getContent();
     }
 }

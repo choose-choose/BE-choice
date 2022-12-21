@@ -50,6 +50,7 @@ public class WebSecurityConfig {
 
         http.authorizeRequests().antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/boards/**").permitAll()
+                .antMatchers("/images").permitAll()        // 확인해보기!!
                 .antMatchers("/api/comment/**").permitAll()
                 .antMatchers("/images").permitAll()
                 .anyRequest().authenticated()
