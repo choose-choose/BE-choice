@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
-public enum Category {
+public enum Local {
 
     //ㄱ
     Gangnam("강남구"), Gangdong("강동구"), Gangseo("강서구"), Gangbuk("강북구"), Gwanak("관악구"),
@@ -32,11 +32,11 @@ public enum Category {
     Jongno("종로구"), Jung("중구"), Jungnang("중랑구");
 
 
-    private final String category;
+    private final String local;
 
-    public static Category valueOfCategory(String category) {
+    public static Local valueOfLocal(String local) {
         return Arrays.stream(values())
-                .filter(value -> value.category.equals(category))
+                .filter(value -> value.local.equals(local))
                 .findAny()
                 .orElse(null);
     }
