@@ -1,5 +1,6 @@
 package com.example.moduhouse.board.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;
@@ -34,6 +35,7 @@ public class BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final S3Uploader s3Uploader;
     private final UrlRepository urlRepository;
+    private final AmazonS3Client amazonS3Client;
 
     @Transactional
     public BoardResponseDto createBoard(BoardRequestDto requestDto, User user, List<String> url) {
@@ -170,6 +172,15 @@ public class BoardService {
             );
         }
 
+        List<Url> urls = urlRepository.findByBoardId(board.getId());
+
+        for (Url url : urls) {
+            String selectUrl = url.getUrl();
+             String fileName = selectUrl.substring(69);
+            s3Uploader.delete(fileName, "static");
+        }
+
+        urlRepository.deleteAllByBoardId(board.getId());
         boardRepository.delete(board);
     }
 
@@ -187,8 +198,8 @@ public class BoardService {
         if(checkBoardLike(boardId,user)){
             throw new CustomException(ErrorCode.ALREADY_CLICKED_LIKE);
         }
-            boardLikeRepository.saveAndFlush(new BoardLike(board, user));
-            return new MsgResponseDto(SuccessCode.LIKE);
+        boardLikeRepository.saveAndFlush(new BoardLike(board, user));
+        return new MsgResponseDto(SuccessCode.LIKE);
     }
 
     @Transactional

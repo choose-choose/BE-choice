@@ -59,11 +59,11 @@ public class BoardController {
         boolean blank = false;
         for (MultipartFile multipart : multipartFile){
             if(multipart.isEmpty()){
-               List<Url> urls = urlRepository.findByBoardId(id);
-               for(Url selectUrl : urls){
-                   url.add(selectUrl.getUrl());
-                   blank = true;
-               }
+                List<Url> urls = urlRepository.findByBoardId(id);
+                for(Url selectUrl : urls){
+                    url.add(selectUrl.getUrl());
+                    blank = true;
+                }
             } else{
                 url.add(s3Uploader.upload(userDetails.getUser(), requestDto, multipart, "static"));
             }
@@ -71,11 +71,6 @@ public class BoardController {
         return boardService.updateBoard(userDetails.getUser(), id, requestDto, url, blank);
     }
 
-//    @PostMapping("/board")
-//    public BoardResponseDto createBoard(@RequestBody BoardRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return boardService.createBoard(requestDto, userDetails.getUser());
-//
-//    }
 
     @GetMapping("/boards")
     public List<BoardResponseDto> getListBoards(@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -100,6 +95,7 @@ public class BoardController {
         return new MsgResponseDto(SuccessCode.DELETE_BOARD);
     }
 
+
     @PostMapping("/board/{boardId}/boardlike")
     public ResponseEntity<MsgResponseDto> saveBoardLike(
             @PathVariable Long boardId,
@@ -113,13 +109,6 @@ public class BoardController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(boardService.saveBoardCancelLike(boardId, userDetails.getUser()));
     }
-
-
-//    @PostMapping("/images")
-//    public String upload(@RequestParam("image") MultipartFile multipartFile)throws IOException {
-//        s3Uploader.upload(multipartFile,"static");
-//        return "test";
-//    }
 
 
 }
