@@ -95,6 +95,7 @@ public class BoardController {
         return new MsgResponseDto(SuccessCode.DELETE_BOARD);
     }
 
+
     @PostMapping("/board/{boardId}/boardlike")
     public ResponseEntity<MsgResponseDto> saveBoardLike(
             @PathVariable Long boardId,

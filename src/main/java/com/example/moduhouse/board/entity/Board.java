@@ -41,7 +41,6 @@ public class Board extends Timestamped {
     @Column
     private String category;
 
-
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Url> urls = new ArrayList<>();
 
