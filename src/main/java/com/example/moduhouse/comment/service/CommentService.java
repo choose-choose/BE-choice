@@ -1,10 +1,11 @@
-package com.example.moduhouse.comment;
+package com.example.moduhouse.comment.service;
 
 import com.example.moduhouse.board.entity.Board;
 import com.example.moduhouse.board.repository.BoardRepository;
 import com.example.moduhouse.comment.dto.CommentRequestDto;
 import com.example.moduhouse.comment.dto.CommentResponseDto;
 import com.example.moduhouse.comment.entity.Comment;
+import com.example.moduhouse.comment.repository.CommentRepository;
 import com.example.moduhouse.global.MsgResponseDto;
 import com.example.moduhouse.global.exception.CustomException;
 import com.example.moduhouse.global.exception.ErrorCode;
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final BoardRepository boardRepository;
-    private final com.example.moduhouse.comment.CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
     public CommentResponseDto saveComment(Long id, CommentRequestDto commentRequestDto, User user) {
         Board board = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NO_BOARD_FOUND)

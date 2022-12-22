@@ -2,6 +2,7 @@ package com.example.moduhouse.comment.controller;
 
 import com.example.moduhouse.comment.dto.CommentRequestDto;
 import com.example.moduhouse.comment.dto.CommentResponseDto;
+import com.example.moduhouse.comment.service.CommentService;
 import com.example.moduhouse.global.MsgResponseDto;
 import com.example.moduhouse.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class CommentController {
-    public final com.example.moduhouse.comment.CommentService commentService;
+    public final CommentService commentService;
 
     // 댓글 생성
     @PostMapping("/comments/{id}")
