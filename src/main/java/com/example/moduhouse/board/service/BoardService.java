@@ -1,6 +1,6 @@
 package com.example.moduhouse.board.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
+
 import com.example.moduhouse.board.dto.BoardRequestDto;
 import com.example.moduhouse.board.dto.BoardResponseDto;
 import com.example.moduhouse.board.entity.Board;

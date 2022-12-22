@@ -11,5 +11,4 @@ public class ModuhouseApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ModuhouseApplication.class, args);
 	}
-
 }
